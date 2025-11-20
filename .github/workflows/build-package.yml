@@ -1,4 +1,4 @@
-name: Build install package
+name: Build install package and post boot image
 
 permissions:
   contents: write
@@ -7,6 +7,11 @@ on:
   schedule:
     - cron: "0 0 1 * *"
   workflow_dispatch:
+    inputs:
+      codename:
+        description: 'Optional codename for this build'
+        required: false
+        default: ''
   push:
     branches:
       - 'main'
@@ -23,21 +28,23 @@ jobs:
     - uses: actions/checkout@v3
 
     - name: Build the Docker image
-      run: docker build . -t 'pipa-fedora-builder'
+      run: docker build . -t 'alioth-fedora-builder'
 
     - name: Build the Fedora image
-      run: docker run --privileged -v "$(pwd)"/images:/build/images -v "/dev:/dev" pipa-fedora-builder
+      run: docker run --privileged -v "$(pwd)"/images:/build/images -v "/dev:/dev" alioth-fedora-builder
 
-    - name: Get current date
+    - name: Get current timestamp
       id: date
-      run: echo "date=$(date +'%Y-%m-%d')" >> $GITHUB_OUTPUT
+      run: echo "timestamp=$(date +'%Y-%m-%d-%H-%M-%S')" >> $GITHUB_OUTPUT
 
     - name: Create Release
       id: create_release
       uses: softprops/action-gh-release@v2
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
-        tag_name: nightly-${{ steps.date.outputs.date }}
-        name: Nightly ${{ steps.date.outputs.date }}
-        files: images/*.zip
+        tag_name: ${{ github.event.inputs.codename && github.event.inputs.codename != '' && format('{0}-{1}', github.event.inputs.codename, steps.date.outputs.timestamp) || steps.date.outputs.timestamp }}
+        name: ${{ github.event.inputs.codename && github.event.inputs.codename != '' && format('Build {0} ({1})', github.event.inputs.codename, steps.date.outputs.timestamp) || format('Build {0}', steps.date.outputs.timestamp) }}
+        files: |
+          images/*.zip
+          images/*/boot.img
         draft: true

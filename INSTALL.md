@@ -5,7 +5,7 @@
 
 - Kernel updates are handled by dnf. Updated boot image will be flashed to the active slot
 - Sensors may break after suspend, everything else should work as expected
-- Sensors are disabled by default, to enable install ```pipa-sensors``` package and enable ```iio-sensor-proxy``` and ```hexagonrpcd-sdsp``` services
+- Sensors are disabled by default, to enable install ```alioth-sensors``` package and enable ```iio-sensor-proxy``` and ```hexagonrpcd-sdsp``` services
 
 </details>
 

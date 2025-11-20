@@ -3,8 +3,8 @@
 ## Run inside a Docker Container
 
 ```
-docker build -t 'pipa-fedora-builder' . 
-docker run --privileged -v "$(pwd)"/images:/build/images -v "/dev:/dev" pipa-fedora-builder
+docker build -t 'alioth-fedora-builder' . 
+docker run --privileged -v "$(pwd)"/images:/build/images -v "/dev:/dev" alioth-fedora-builder
 ```
 
 ### Building Notes
